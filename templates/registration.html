@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}
+Регистрация
+{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/dataTables.bootstrap4.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 10px">
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{url_for('competitions')}}">Список соревнований</a></li>
+    <li class="breadcrumb-item"><a href="{{url_for('competition_view', competition_id = competition_data.competition_id)}}">{{ competition_data.competition_name }}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Регистрация</li>
+  </ol>
+</nav>
+<h3>{{ competition_data.competition_name }} Регистрация</h3>
+
+
+<a href="{{url_for('registration_new', competition_id = competition_data.competition_id)}}"><button type="button" class="btn btn-primary" id="create_competition_button">Регистрация</button></a>
+
+<p></p>
+<table id="registration_table" class="table table-striped table-bordered" style="width:100%">
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>ФИО</th>
+                <th>Вес, кг</th>
+                <th>Весовая категория</th>
+                <th>Возраст</th>
+                <th>Возрастная категория</th>
+
+
+            </tr>
+        </thead>
+        <tbody>
+        {% for reg in regs %}
+            <tr>
+                <td>{{ reg.id }} </td>
+                <td>
+                    <a href="{{url_for('registration_view', competition_id = competition_data.competition_id, registration_id = reg.id)}}">
+                          {{ reg.fighter.name }} {{ reg.fighter.last_name}}
+                    </a>
+                </td>
+                <td>
+                    {{ reg.fighter_registration_weight }}
+                </td>
+                <td>
+                    {{ reg.weight_categories.weight_category_name }}
+                </td>
+                <td>
+                    {{ reg.fighter_registration_age }}
+                </td>
+                <td>
+                    {{ reg.age_categories.age_category_name }}
+                </td>
+
+
+            </tr>
+        {% endfor %}
+
+
+    </table>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.24/datatables.min.js" defer></script>
+
+
+
+{#<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js" defer></script>
+<script src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap4.min.js"></script>#}
+
+<script>
+    $(document).ready(function() {
+        $('#registration_table').DataTable();
+} );
+</script>
+
+{% endblock %}

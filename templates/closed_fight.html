@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% block title %}
+Referee
+{% endblock %}
+
+
+{% block content %}
+
+    <div class="container" style="margin-top: 10px">
+        <div class="row"> <!-- это ряд, в котором лежат два блока - карточка боя и настройки -->
+            <div class="col-lg-12 shadow p-3 mb-5 bg-white rounded text-center"> <!-- это колонка с карточкой боя -->
+                <nav aria-label="breadcrumb">
+                      <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{url_for('competitions')}}">Список соревнований</a></li>
+                        <li class="breadcrumb-item"><a href="{{url_for('competition_view', competition_id = competition.competition_id)}}">{{ competition.competition_name }}</a></li>
+                        <li class="breadcrumb-item"><a href="{{url_for('competition_fights_view', comp_id = competition.competition_id)}}">Список боев</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Бой №{{ fight.fight_id }}. Завершен</li>
+                      </ol>
+                </nav>
+                <h5 class="text-left">Возрастная категория: {{ agecat.age_category_name }}. Весовая категория: {{ weightcat.weight_category_name }}. Круг: {{ round.round_name }}</h5>
+                <h5 class="text-left">Результат боя: {{ fight.fight_result}}</h5>
+                <br>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Участник</th>
+                      <th scope="col">{{ fight.red_fighter.name }} {{ fight.red_fighter.last_name }}</th>
+                      <th scope="col">{{ fight.blue_fighter.name }} {{ fight.blue_fighter.last_name }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">Счет</th>
+                      <td>{{ fight.red_fighter_score}}</td>
+                      <td>{{ fight.blue_fighter_score}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+
+            </div><!--конец дива с колонкой с карточкой боя -->
+
+
+
+
+        </div><!--конец дива row в котором лежат два блока - карточка боя и настройки  -->
+    </div> <!--конец дива Container -->
+
+
+
+<!-- Начало скриптов -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js" integrity="sha256-bQmrZe4yPnQrLTY+1gYylfNMBuGfnT/HKsCGX+9Xuqo=" crossorigin="anonymous"></script>
+    <script>
+
+        $(document).ready(function(){
+            $("#fight-result-button").prop('disabled', true)
+            $('input[type=radio][name=fightresult]').change(function() {
+                $("#fight-result-button").prop('disabled', false)
+            });
+
+
+            {#Обработчик кнопки "Завершени боя". Передаем в модальное окно значение из результата боя#}
+            $('#fight-result-button').on('click', function() {
+                var fight_result = $('input[name="fightresult"]:checked').val();
+                var text_in_modal = ''
+                if (fight_result === 'winner_red'){
+                    text_in_modal = 'Победил {{ fight.red_fighter.name +" " + fight.red_fighter.last_name }}'
+                } else if(fight_result === 'winner_blue'){
+                    text_in_modal = 'Победил {{ fight.blue_fighter.name +" " + fight.blue_fighter.last_name }}'
+                } else {
+                    text_in_modal = 'Ничья'
+                }
+                document.getElementById('modal_text').innerHTML = text_in_modal
+
+            })
+            /*функция, которая забирает время, а отдает текст*/
+            function timer_display(current_time_value){
+                var minutes = ('0' + Math.floor((current_time_value / 60) % 60)).slice(-2);
+                var seconds = ('0' + Math.floor(current_time_value % 60)).slice(-2);
+                time_display = minutes + ':' + seconds
+                return time_display
+                    }
+            /*при загрузке страницы передаем в счетчик значени с сервера */
+
+            document.getElementById('timer_master').innerHTML = timer_display({{fight_duration_server_value}})
+            document.getElementById('left_fighter_score_result_text').innerHTML = {{ left_fighter_score }}
+
+
+
+                // sending a connect request to the server.
+            //var socket = io.connect('http://localhost:5000');
+            var socket = io.connect();
+            var myInterval = -1;
+            var audio = new Audio('https://drive.google.com/uc?export=download&confirm=no_antivirus&id=1Z9ZPjpxTQEBpegk5nU5lGdaNZlKTQf8K');
+            var time = {{ fight_duration_server_value }}
+            var timer = document.getElementById('timer_master');
+            var left_score = {{ left_fighter_score }};
+            var right_score = 0;
+            var competition_name = '{{competition.competition_name}}';
+            var weight_category_name = '{{ weightcat.weight_category_name }}'
+            var age_category_name = '{{ agecat.age_category_name }}'
+            var roundno = '{{ round.round_name }}'
+            var red_pic = '{{ fight.red_fighter.fighter_image }}'
+            var blue_pic = '{{ fight.blue_fighter.fighter_image }}'
+
+            socket.emit('Fight_data', {'competition_name': competition_name, 'weight_category_name': weight_category_name, 'age_category_name': age_category_name, 'roundno': roundno, 'red_pic': red_pic, 'blue_pic': blue_pic});
+            console.log("red_pic =" + red_pic)
+        // An event handler for a change of value
+        //Event handler is defined on class sync thus will work for both slider1 and slider2.
+        //The line having socket.emit() emits a custom event named slider value changed which can then be received on server side
+        $('input.sync').on('input', function() {
+            socket.emit('Slider value changed', {
+                who:$(this).attr('id'),
+                data: $(this).val()
+             });
+             return false;
+         });
+
+        // При изменении значения счетчика нужно отправлять на сервер новое значение.
+        // Значит, эта отправка должна быть внутри конструкции $('input.sync').on('input', function(event) {
+        //button_start_stop = document.getElementById('start-stop-button')
+            $('#start-stop-button').on('click', function() {
+                var $this = $(this);
+                if ($this.hasClass('btn-dark')) {
+                    $this.removeClass('btn-dark').addClass('btn-primary');
+                    }
+                else if ($this.hasClass('btn-primary')) {
+                    $this.removeClass('btn-primary').addClass('btn-dark');
+                }
+
+
+                if (myInterval === -1 && time >0) {
+
+                        document.getElementById('start-stop-button').innerHTML = 'Pause';
+                        myInterval = setInterval(function(){
+
+                                    time --;
+                                    var minutes = ('0' + Math.floor((time / 60) % 60)).slice(-2);
+                                    var seconds = ('0' + Math.floor(time % 60)).slice(-2);
+                                    time_display = minutes + ':' + seconds
+
+                                    socket.emit('Timer value changed', {'timer_sent': time});
+                                    document.getElementById('timer_master').innerHTML = time_display;
+
+
+                                    if (time <= 0){
+                                        clearInterval(myInterval);
+                                        audio.play();
+                                        document.getElementById('start-stop-button').innerHTML = 'Finished';
+
+                                    }
+                        }, 1000);
+                    } else {
+                        clearInterval(myInterval);
+                        myInterval = -1;
+                        document.getElementById('start-stop-button').innerHTML = 'Start';
+
+                    }
+
+
+
+            })
+            // Кнопка Сбросить время
+            ////////////////////////////////////////////////////
+
+            $('#reset_button').on('click', function(event) {
+                time = {{default_duration_DB_value}}
+                timer.innerHTML = timer_display(time)
+                socket.emit('Timer value changed', {'timer_sent': time});
+                clearInterval(myInterval);
+                myInterval = -1;
+                document.getElementById('start-stop-button').innerHTML = 'Start';
+                var $this = $('#start-stop-button');
+                if ($this.hasClass('btn-primary')) {
+                    $this.removeClass('btn-primary').addClass('btn-dark');
+                    }
+                })
+
+
+            // Кнопка Добавить время
+            ////////////////////////////////////////////////////
+            $('#add_time_button').on('click', function(event) {
+                time = {{added_time_server_value}}
+                timer.innerHTML = timer_display(time)
+                socket.emit('Timer value changed', {'timer_sent': time});
+                clearInterval(myInterval);
+                myInterval = -1;
+                document.getElementById('start-stop-button').innerHTML = 'Start';
+                var $this = $('#start-stop-button');
+                if ($this.hasClass('btn-primary')) {
+                    $this.removeClass('btn-primary').addClass('btn-dark');
+                    }
+                })
+            /////////////////////////////////////////////////////
+
+            // Кнопка Добавить балл левому бойцу
+            ////////////////////////////////////////////////////
+            $('#left_fighter_plus_score_button').on('click', function(event) {
+                left_score++;
+                socket.emit('Score value changed', {'left_fighter_score': left_score});
+                document.getElementById('left_fighter_score_result_text').innerHTML = left_score;
+
+                })
+            /////////////////////////////////////////////////////
+
+            // Кнопка Убрать балл левому бойцу
+             ////////////////////////////////////////////////////
+            $('#left_fighter_minus_score_button').on('click', function(event) {
+                if (left_score >0){
+                    left_score--;
+                    socket.emit('Score value changed', {'left_fighter_score': left_score});
+                    document.getElementById('left_fighter_score_result_text').innerHTML = left_score;
+                }
+                })
+
+            // Кнопка Добавить балл правому бойцу
+            ////////////////////////////////////////////////////
+            $('#right_fighter_plus_score_button').on('click', function(event) {
+                right_score++;
+                socket.emit('Right score value changed', {'right_fighter_score': right_score});
+                document.getElementById('right_fighter_score_result_text').innerHTML = right_score;
+                })
+            /////////////////////////////////////////////////////
+
+
+            // Кнопка убрать балл правого бойца
+            ////////////////////////////////////////////////////
+            $('#right_fighter_minus_score_button').on('click', function(event) {
+                if (right_score >0){
+                    right_score--;
+                    socket.emit('Right score value changed', {'right_fighter_score': right_score});
+                    document.getElementById('right_fighter_score_result_text').innerHTML = right_score;
+                }
+                })
+            /////////////////////////////////////////////////////
+
+
+
+
+
+
+            // Принимаем сообщение с сервера в консоль
+        {#socket.on('update_timer_value', function (msg){
+            console.log(msg['timer_sent']);
+        })#}
+
+
+        //receiving an event over channel after connect and update value the respective callback function is executed.
+        // Мы получили с сервера сообщение по каналу 'after connect'
+        // Получив по каналу собщение мы отображаем его в консоли.
+        socket.on('after connect', function(msg){
+            console.log('After connect', msg.data);
+        });
+
+        // Получив с сервера сообщение о перемещении слайдера мы двигаем сладйдер в новую позицию
+        socket.on('update value', function(msg) {
+             console.log('Slider value updated');
+             $('#'+msg.who).val(msg.data);
+        });
+
+
+
+
+}); // конец функции - загрузчика страницы
+    </script>
+<!-- Это кноец блока CONTENT-->
+{% endblock %}
+
+
+
+
+
+
+

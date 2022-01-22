@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <!-- Bootstrap CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+
+    <title>test</title>
+
+</head>
+<body>
+
+{% for i in range(0, test_value)%}
+    {%if i == 1 %}
+        <p>тест</p>
+    {%endif%}
+{% endfor %}
+
+<p></p>
+
+<div id="targetDIV" style="border: 1px solid Red">
+    {#This text is surrounded by a DIV tag whose id is "targetDIV".#}
+</div>
+
+<button id="btn1">Append text</button>
+<button id="btn2">Append list items</button>
+
+<p>тест area</p>
+<div id="wrapper">
+
+</div>
+
+</body>
+
+
+<!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+
+<script>
+    $(document).ready(function() {
+        for (step = 0; step < 5; step++) {
+              // Запускается 5 раз, с шагом от 0 до 4.
+              $( "#wrapper" ).append( "<p>{{ test_value }} </p>" );
+              console.log(step)
+            document.getElementById('wrapper').innerHTML = step
+
+
+            }
+
+
+        let total_number_of_fighters = 4
+        let total_number_of_fights = Math.floor(total_number_of_fighters / 2)
+
+
+
+        $("#btn1").click(function(){
+            var step;
+            for (step = 0; step < 5; step++) {
+              // Запускается 5 раз, с шагом от 0 до 4.
+              $("<div>hello stackoverflow users</div>").appendTo("#targetDIV"); //appendTo: Append at inside bottom
+            }
+
+
+
+    });
+    $("#btn2").click(function(){
+        $("ol").prepend("<li>Prepended item {{ test_value }}</li>");
+      });
+
+} );
+</script>
+
+</body>
+</html>

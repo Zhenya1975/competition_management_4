@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{#{% import "bootstrap/wtf.html" as wtf %}#}
+{% block title %}
+settings
+{% endblock %}
+
+{% block content %}
+<div class="container">
+      <h2 class="title">Настройки</h2>
+    <a href="{{url_for('visitor')}}" target="_blank">Страница посетителей</a>
+      <h3 class="title">Время</h3>
+
+
+  {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul style="padding-left: 0">
+            {% for message in messages %}
+            <div class="alert alert-success" role="alert">
+                <li style="list-style-type: none;">{{ message }}</li>
+            </div>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    {% endwith %}
+
+
+
+      <form method="POST" action="{{ url_for('settings_form') }}">
+            {{ form.csrf_token }}
+          <fieldset class="form-field">
+              {{ form.fight_duration.label }}
+              {{ form.fight_duration(class ='form-control', autocomplete="off", type="number", id = "fight_duration_input")}}
+                <br>
+              {% for error in form.fight_duration.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+              {% endfor %}
+          </fieldset>
+          <fieldset class="form-field">
+              {{ form.added_time.label }}
+              {{ form.added_time(class ='form-control', autocomplete="off", type="number", id = "added_time_input")}}
+          </fieldset>
+            <br>
+        {{ form.submit (class ='btn btn-primary')}}
+
+      </form>
+            <hr/>
+            <h3 class="title">Весовые категории</h3>
+
+            <a href="{{url_for('weight_category_new')}}"><button type="button" class="btn btn-outline-primary">Создать</button></a>
+            {#<button type="button" class="btn btn-outline-primary">Создать</button>#}
+    <p></p>
+
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Наименование</th>
+                      <th scope="col">Индекс сортировки</th>
+                      <th scope="col">От</th>
+                      <th scope="col">До</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                   {% for w_cat in w_categories %}
+                    <tr>
+                      <th scope="row">{{ w_cat.weight_cat_id }}</th>
+                      <td>
+                          <a href="{{url_for('weight_category_edit', id = w_cat.weight_cat_id)}}">
+                          {{ w_cat.weight_category_name }}
+                          </a>
+                          </td>
+                      <td>{{ w_cat.sort_index }}</td>
+                      <td>{{ w_cat.weight_category_start}}</td>
+                      <td>{{ w_cat.weight_category_finish}}</td>
+                    </tr>
+                    <tr>
+                   {% endfor %}
+
+                  </tbody>
+                </table>
+        <hr/>
+        <h3 class="title">Возрастные категории</h3>
+        <a href="#"><button type="button" class="btn btn-outline-primary">Создать</button></a>
+        <p></p>
+        <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Наименование</th>
+                      <th scope="col">Индекс сортировки</th>
+                      <th scope="col">От</th>
+                      <th scope="col">До</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                   {% for age_cat in age_categories %}
+                    <tr>
+                      <th scope="row">{{ age_cat.id }}</th>
+                      <td>
+                          {#<a href="{{url_for('weight_category_edit', id = w_cat.id)}}">#}
+                          {{ age_cat.age_category_name }}
+                          {#</a>#}
+                      </td>
+                      <td>{{ age_cat.sort_index }}</td>
+                      <td>{{ age_cat.age_category_start }}</td>
+                      <td>{{ age_cat.age_category_finish }}</td>
+                    </tr>
+                    <tr>
+                   {% endfor %}
+
+                  </tbody>
+                </table>
+
+
+    </div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+    document.getElementById('fight_duration_input').value = {{ default_duration_DB_value }}
+    document.getElementById('added_time_input').value = {{ added_time_server_value }}
+})
+</script>
+
+{% endblock %} <!-- конец блока content -->

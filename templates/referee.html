@@ -1,0 +1,503 @@
+{% extends "base.html" %}
+
+{% block title %}
+Referee
+{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+{% endblock %}
+{% block content %}
+    {#  это слайдеры  #}
+    {#<div class="container text-center">
+		<h1 >Слайдеры</h1>
+		<form class="mt-5">
+		  <div class="form-group">
+		    <label for="formControlRange">Demo Slider 1</label>
+		    <input type="range" class="form-control-range sync" id="slider1" min="0" max="50" value="{{slider1}}">
+		  </div>
+		  <div class="form-group">
+		    <label for="formControlRange">Demo Slider 2</label>
+		    <input type="range" class="form-control-range sync" id="slider2" min="0" max="50" value="{{slider2}}">
+		  </div>
+		</form>
+	</div>#} {#  конец слайдеров  #}
+
+    <div class="container" style="margin-top: 10px">
+        <div class="row"> <!-- это ряд, в котором лежат два блока - карточка боя и настройки -->
+            <div class="col-lg-9 shadow p-3 mb-5 bg-white rounded text-center"> <!-- это колонка с карточкой боя -->
+                <nav aria-label="breadcrumb">
+                      <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{url_for('competitions')}}">Список соревнований</a></li>
+                        <li class="breadcrumb-item"><a href="{{url_for('competition_view', competition_id = competition.competition_id)}}">{{ competition.competition_name }}</a></li>
+                        <li class="breadcrumb-item"><a href="{{url_for('competition_fights_view', comp_id = competition.competition_id)}}">Список боев</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Бой №{{ fight.fight_id }}</li>
+                      </ol>
+                </nav>
+                <h6 class="text-left">Возрастная категория: {{ agecat.age_category_name }}. Весовая категория: {{ weightcat.weight_category_name }}. Круг: {{ round.round_name }}</h6>
+                <div class="row"> <!--ряд с участниками -->
+
+                    <div class="col d-flex justify-content-start"> <!--левая колонка для левого участника -->
+
+                            <div style="background-color: red; width: 5%; margin-right: 5px"></div> <!-- это див с красной полоской -->
+                            <div> <!-- это див с левым участником-->
+
+                                <h2>{{ fight.red_fighter.name +" " + fight.red_fighter.last_name }}</h2>
+                                <img src= {{ fight.red_fighter.fighter_image }} class="float-left" alt="Responsive image" width="150" height="150">
+
+
+                            </div> <!-- конец дива с левым участником-->
+                    </div> <!--конец левой колонкя для левого участника -->
+                    <div class="col d-flex justify-content-start"> <!--правая колонка для правого участника -->
+                        <div style="background-color: blue; width: 5%; margin-right: 5px"></div> <!-- это див с красной полоской -->
+                        <div> <!-- это див с правым участником-->
+                            {#{% for fighter in fighters_from_DB %}
+                                {% if fighter.red_fighter == False %}#}
+                                    <h2>{{ fight.blue_fighter.name +" " + fight.blue_fighter.last_name }}</h2>
+                                    <img src={{ fight.blue_fighter.fighter_image }} class="float-left" alt="Responsive image" width="150" height="150">
+                                {#{% endif %}
+                            {% endfor %}#}
+
+                        </div> <!-- конец дива с правым участником-->
+                    </div><!--конец правой колонки для правого участника -->
+
+
+                </div> <!--конец ряда с участниками -->
+                <br>
+
+                <div class="row justify-content-center">  <!--ряд с текстом СЧЕТ -->
+                    <h2>СЧЁТ</h2>
+                </div> <!--конец ряда с текстом СЧЕТ -->
+                {#<br>#}
+                <div class="row justify-content-center">  <!--ряд со счетом и кнопками -->
+                    <div class="col-xs-4 my-auto">
+                      <button type="button" class="btn btn-secondary btn-lg" id="left_fighter_plus_score_button">+1 Балл</button>
+                        <button type="button" class="btn btn-secondary btn-lg" id="left_fighter_minus_score_button">-1</button>
+                    </div>
+                    <div class="col-6 display-4">
+                     <span id="left_fighter_score_result_text">0</span>
+                        <span> : </span>
+                        <span id="right_fighter_score_result_text">0</span>
+                    </div>
+                    <div class="col-xs-4 my-auto">
+                        <button type="button" class="btn btn-secondary btn-lg" id="right_fighter_plus_score_button">+1 Балл</button>
+                        <button type="button" class="btn btn-secondary btn-lg" id="right_fighter_minus_score_button">-1</button>
+                    </div>
+                </div> <!--конец ряда со счетом и кнопками -->
+
+                <hr/>
+
+                 {#<div class="row justify-content-center">
+                    <h2>ВЫХОД ЗА ПЛОЩАДКУ</h2>
+                </div>#}
+
+                <div class="row justify-content-center">
+                    <div class="col-xs-4 my-auto">
+                      <button type="button" class="btn btn-secondary btn-lg" id="left_fighter_plus_score_button">+1 Д</button>
+                        <button type="button" class="btn btn-secondary btn-lg" id="left_fighter_minus_score_button">-1</button>
+                    </div>
+                    <div class="col-6 display-4">
+                     <span id="left_fighter_score_result_text">0</span>
+                        <span> : </span>
+                        <span id="right_fighter_score_result_text">0</span>
+                    </div>
+                    <div class="col-xs-4 my-auto">
+                        <button type="button" class="btn btn-secondary btn-lg" id="right_fighter_plus_score_button">+1 Д</button>
+                        <button type="button" class="btn btn-secondary btn-lg" id="right_fighter_minus_score_button">-1</button>
+                    </div>
+                </div> <!--конец ряда со счетом и кнопками -->
+
+                <hr/>
+
+                {# <div class="row justify-content-center">
+                    <h2>КОНТАКТ</h2>
+                </div>#}
+
+                <div class="row justify-content-center">
+                    <div class="col-xs-4 my-auto">
+                      <button type="button" class="btn btn-secondary btn-lg" id="left_fighter_plus_score_button">+1 Х</button>
+                        <button type="button" class="btn btn-secondary btn-lg" id="left_fighter_minus_score_button">-1</button>
+                    </div>
+                    <div class="col-6 display-4">
+                     <span id="left_fighter_score_result_text">0</span>
+                        <span> : </span>
+                        <span id="right_fighter_score_result_text">0</span>
+                    </div>
+                    <div class="col-xs-4 my-auto">
+                        <button type="button" class="btn btn-secondary btn-lg" id="right_fighter_plus_score_button">+1 Х</button>
+                        <button type="button" class="btn btn-secondary btn-lg" id="right_fighter_minus_score_button">-1</button>
+                    </div>
+                </div> <!--конец ряда со счетом и кнопками -->
+
+                <hr/>
+                <div class="row justify-content-center">
+                    <div class="col-xs-4 my-auto">
+                      <button type="button" class="btn btn-secondary btn-lg" id="left_fighter_plus_score_button">+1 М</button>
+                        <button type="button" class="btn btn-secondary btn-lg" id="left_fighter_minus_score_button">-1</button>
+                    </div>
+                    <div class="col-6 display-4">
+                     <span id="left_fighter_score_result_text">0</span>
+                        <span> : </span>
+                        <span id="right_fighter_score_result_text">0</span>
+                    </div>
+                    <div class="col-xs-4 my-auto">
+                        <button type="button" class="btn btn-secondary btn-lg" id="right_fighter_plus_score_button">+1 М</button>
+                        <button type="button" class="btn btn-secondary btn-lg" id="right_fighter_minus_score_button">-1</button>
+                    </div>
+                </div> <!--конец ряда со счетом и кнопками -->
+
+
+                <div class="row justify-content-center"><!--тестовый ряд для вывода даных из базы -->
+                    <div class="col-xs-12">
+
+                    </div>
+
+                </div> <!--конец ряда выводом из базы -->
+            </div><!--конец дива с колонкой с карточкой боя -->
+
+
+            <!--Колонка с настройками-->
+            <div class="col-lg-3 shadow p-3 mb-5 bg-white rounded"> <!-- это колонка с настройками -->
+                <h1 class="display-2" id="timer_master" style="text-align: center"></h1>
+                <button id="start-stop-button" type="button" class="btn btn-dark btn-block" style="font-size: xx-large">Start</button>
+                <br>
+
+                <hr/>
+                 {#<p>Сбросить таймер#}
+                    <button type="button" class="btn btn-danger btn-sm" id="reset_button">
+                      Сброс таймера
+                    </button>
+
+                <hr/>
+                {#<p>Добавить время#}
+                    <button type="button" class="btn btn-info btn-sm" id="add_time_button">
+                      Добавить время
+                    </button>
+                <hr/>
+                <form method="POST" action="{{ url_for('fight_finished', comp_id = competition.competition_id, fight_id= fight.fight_id)}}">
+                <h3>Результат боя</h3>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="fightresult" id="winner_red_radio" value="winner_red">
+                  <label class="form-check-label" for="winner_red_radio">
+                    Победил {{ fight.red_fighter.name +" " + fight.red_fighter.last_name }}
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="fightresult" id="winner_blue_radio" value="winner_blue">
+                  <label class="form-check-label" for="winner_blue_radio">
+                    Победил {{ fight.blue_fighter.name +" " + fight.blue_fighter.last_name }}
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="fightresult" id="draw_radio" value="draw">
+                  <label class="form-check-label" for="draw_radio">
+                    Ничья
+                  </label>
+                </div>
+                <p></p>
+
+                <!-- Button trigger modal -->
+                <button id="fight-result-button" type="button" class="btn btn-outline-dark btn-lg btn-block" data-toggle="modal" data-target="#exampleModal">
+                  Завершить бой
+                </button>
+
+                <!-- Modal -->
+                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Завершение боя</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <h5 id="modal_text"></h5>
+                          <hr/>
+                        <h5 id="looser_name"></h5>
+                          <p id="red_fighter_history">
+                              {% for round_name, fight_result in red_fighter_history.items() %}
+                                  {{ fight_result['round']}}. {{ fight_result['partner']}}. {{ fight_result['result']}}
+                              {% endfor %}
+                          </p>
+                          <p id="blue_fighter_history">
+                              {% for round_name, fight_result in blue_fighter_history.items() %}
+                                  {{ fight_result['round']}}. {{ fight_result['partner']}}. {{ fight_result['result']}}
+                              {% endfor %}
+                          </p>
+                            <div class="form-check" id = 'fighter_finished_div'>
+                              <input class="form-check-input" type="checkbox" id="fighter_finished" name="fighter_finished" value={{ fight.round_number }} >
+                              <label class="form-check-label" for="fighter_finished">
+                                Завершил выступление
+                              </label>
+                            </div>
+                      </div>
+
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
+                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                </form>
+            </div> <!-- конец колонки с настройками -->
+
+        </div><!--конец дива row в котором лежат два блока - карточка боя и настройки  -->
+    </div> <!--конец дива Container -->
+
+
+
+<!-- Начало скриптов -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js" integrity="sha256-bQmrZe4yPnQrLTY+1gYylfNMBuGfnT/HKsCGX+9Xuqo=" crossorigin="anonymous"></script>
+    <script>
+
+        $(document).ready(function(){
+            {#console.log({{ red_fighter_history }})#}
+            $("#fight-result-button").prop('disabled', true)
+            $('input[type=radio][name=fightresult]').change(function() {
+                $("#fight-result-button").prop('disabled', false)
+            });
+
+
+            {#Обработчик кнопки "Завершени боя". Передаем в модальное окно значение из результата боя#}
+            $('#fight-result-button').on('click', function() {
+                var fight_result = $('input[name="fightresult"]:checked').val();
+                var text_in_modal = ''
+                var looser_name = ''
+                $('#fighter_finished').change(function() {
+                    if($(this).is(":checked")) {
+                        console.log($('input[name="fighter_finished"]:checked').val());
+                    } else {
+                        console.log('не выбран');
+                    }
+                })
+
+                {#var red_fighter_history = {{ red_fighter_history }}#}
+                if (fight_result === 'winner_red'){
+                    text_in_modal = 'Победил {{ fight.red_fighter.name +" " + fight.red_fighter.last_name }}'
+                    looser_name = 'Результаты {{ fight.blue_fighter.name +" " + fight.blue_fighter.last_name }}:'
+                    document.getElementById('red_fighter_history').hidden = true
+                    document.getElementById('blue_fighter_history').hidden = false
+
+                    //console.log(text)
+                } else if(fight_result === 'winner_blue'){
+                    text_in_modal = 'Победил {{ fight.blue_fighter.name +" " + fight.blue_fighter.last_name }}'
+                    looser_name = 'Результаты {{ fight.red_fighter.name +" " + fight.red_fighter.last_name }}:'
+                    document.getElementById('red_fighter_history').hidden = false
+                    document.getElementById('blue_fighter_history').hidden = true
+
+                } else {
+                    text_in_modal = 'Ничья'
+                    document.getElementById('fighter_finished_div').hidden = true
+                    document.getElementById('red_fighter_history').hidden = true
+                    document.getElementById('blue_fighter_history').hidden = true
+
+                }
+                document.getElementById('modal_text').innerHTML = text_in_modal
+                document.getElementById('looser_name').innerHTML = looser_name
+
+            })
+            /*функция, которая забирает время, а отдает текст*/
+            function timer_display(current_time_value){
+                var minutes = ('0' + Math.floor((current_time_value / 60) % 60)).slice(-2);
+                var seconds = ('0' + Math.floor(current_time_value % 60)).slice(-2);
+                time_display = minutes + ':' + seconds
+                return time_display
+                    }
+            /*при загрузке страницы передаем в счетчик значени с сервера */
+
+            document.getElementById('timer_master').innerHTML = timer_display({{fight_duration_server_value}})
+            document.getElementById('left_fighter_score_result_text').innerHTML = {{ left_fighter_score }}
+            document.getElementById('right_fighter_score_result_text').innerHTML = {{ right_fighter_score }}
+
+
+
+                // sending a connect request to the server.
+            //var socket = io.connect('http://localhost:5000');
+            var socket = io.connect();
+            var myInterval = -1;
+            var audio = new Audio('https://drive.google.com/uc?export=download&confirm=no_antivirus&id=1Z9ZPjpxTQEBpegk5nU5lGdaNZlKTQf8K');
+            var time = {{ fight_duration_server_value }}
+            var timer = document.getElementById('timer_master');
+            var left_score = {{ left_fighter_score }};
+            var right_score = {{ right_fighter_score }};
+            var competition_name = '{{competition.competition_name}}';
+            var weight_category_name = '{{ weightcat.weight_category_name }}'
+            var age_category_name = '{{ agecat.age_category_name }}'
+            var roundno = '{{ round.round_name }}'
+            var red_pic = '{{ fight.red_fighter.fighter_image }}'
+            var blue_pic = '{{ fight.blue_fighter.fighter_image }}'
+
+            socket.emit('Fight_data', {'competition_name': competition_name, 'weight_category_name': weight_category_name, 'age_category_name': age_category_name, 'roundno': roundno, 'red_pic': red_pic, 'blue_pic': blue_pic});
+            //console.log("red_pic =" + red_pic)
+        // An event handler for a change of value
+        //Event handler is defined on class sync thus will work for both slider1 and slider2.
+        //The line having socket.emit() emits a custom event named slider value changed which can then be received on server side
+        //$('input.sync').on('input', function() {
+        //    socket.emit('Slider value changed', {
+        //        who:$(this).attr('id'),
+        //        data: $(this).val()
+        //     });
+        //     return false;
+         //});
+
+        // При изменении значения счетчика нужно отправлять на сервер новое значение.
+        // Значит, эта отправка должна быть внутри конструкции $('input.sync').on('input', function(event) {
+        //button_start_stop = document.getElementById('start-stop-button')
+            $('#start-stop-button').on('click', function() {
+                var $this = $(this);
+                if ($this.hasClass('btn-dark')) {
+                    $this.removeClass('btn-dark').addClass('btn-primary');
+                    }
+                else if ($this.hasClass('btn-primary')) {
+                    $this.removeClass('btn-primary').addClass('btn-dark');
+                }
+
+
+                if (myInterval === -1 && time >0) {
+
+                        document.getElementById('start-stop-button').innerHTML = 'Pause';
+                        myInterval = setInterval(function(){
+
+                                    time --;
+                                    var minutes = ('0' + Math.floor((time / 60) % 60)).slice(-2);
+                                    var seconds = ('0' + Math.floor(time % 60)).slice(-2);
+                                    time_display = minutes + ':' + seconds
+
+                                    socket.emit('Timer value changed', {'timer_sent': time});
+                                    document.getElementById('timer_master').innerHTML = time_display;
+
+
+                                    if (time <= 0){
+                                        clearInterval(myInterval);
+                                        audio.play();
+                                        document.getElementById('start-stop-button').innerHTML = 'Finished';
+
+                                    }
+                        }, 1000);
+                    } else {
+                        clearInterval(myInterval);
+                        myInterval = -1;
+                        document.getElementById('start-stop-button').innerHTML = 'Start';
+
+                    }
+
+
+
+            })
+            // Кнопка Сбросить время
+            ////////////////////////////////////////////////////
+
+            $('#reset_button').on('click', function(event) {
+                time = {{default_duration_DB_value}}
+                timer.innerHTML = timer_display(time)
+                socket.emit('Timer value changed', {'timer_sent': time});
+                clearInterval(myInterval);
+                myInterval = -1;
+                document.getElementById('start-stop-button').innerHTML = 'Start';
+                var $this = $('#start-stop-button');
+                if ($this.hasClass('btn-primary')) {
+                    $this.removeClass('btn-primary').addClass('btn-dark');
+                    }
+                })
+
+
+            // Кнопка Добавить время
+            ////////////////////////////////////////////////////
+            $('#add_time_button').on('click', function(event) {
+                time = {{added_time_server_value}}
+                timer.innerHTML = timer_display(time)
+                socket.emit('Timer value changed', {'timer_sent': time});
+                clearInterval(myInterval);
+                myInterval = -1;
+                document.getElementById('start-stop-button').innerHTML = 'Start';
+                var $this = $('#start-stop-button');
+                if ($this.hasClass('btn-primary')) {
+                    $this.removeClass('btn-primary').addClass('btn-dark');
+                    }
+                })
+            /////////////////////////////////////////////////////
+
+            // Кнопка Добавить балл левому бойцу
+            ////////////////////////////////////////////////////
+            $('#left_fighter_plus_score_button').on('click', function(event) {
+                left_score++;
+                socket.emit('Score value changed', {'left_fighter_score': left_score});
+                document.getElementById('left_fighter_score_result_text').innerHTML = left_score;
+
+                })
+            /////////////////////////////////////////////////////
+
+            // Кнопка Убрать балл левому бойцу
+             ////////////////////////////////////////////////////
+            $('#left_fighter_minus_score_button').on('click', function(event) {
+                if (left_score >0){
+                    left_score--;
+                    socket.emit('Score value changed', {'left_fighter_score': left_score});
+                    document.getElementById('left_fighter_score_result_text').innerHTML = left_score;
+                }
+                })
+
+            // Кнопка Добавить балл правому бойцу
+            ////////////////////////////////////////////////////
+            $('#right_fighter_plus_score_button').on('click', function(event) {
+                right_score++;
+                socket.emit('Right score value changed', {'right_fighter_score': right_score});
+                document.getElementById('right_fighter_score_result_text').innerHTML = right_score;
+                })
+            /////////////////////////////////////////////////////
+
+
+            // Кнопка убрать балл правого бойца
+            ////////////////////////////////////////////////////
+            $('#right_fighter_minus_score_button').on('click', function(event) {
+                if (right_score >0){
+                    right_score--;
+                    socket.emit('Right score value changed', {'right_fighter_score': right_score});
+                    document.getElementById('right_fighter_score_result_text').innerHTML = right_score;
+                }
+                })
+            /////////////////////////////////////////////////////
+
+
+
+
+
+
+            // Принимаем сообщение с сервера в консоль
+        {#socket.on('update_timer_value', function (msg){
+            console.log(msg['timer_sent']);
+        })#}
+
+
+        //receiving an event over channel after connect and update value the respective callback function is executed.
+        // Мы получили с сервера сообщение по каналу 'after connect'
+        // Получив по каналу собщение мы отображаем его в консоли.
+        socket.on('after connect', function(msg){
+            console.log('After connect', msg.data);
+        });
+
+        // Получив с сервера сообщение о перемещении слайдера мы двигаем сладйдер в новую позицию
+        socket.on('update value', function(msg) {
+             console.log('Slider value updated');
+             $('#'+msg.who).val(msg.data);
+        });
+
+
+
+
+}); // конец функции - загрузчика страницы
+    </script>
+<!-- Это кноец блока CONTENT-->
+{% endblock %}
+
+
+
+
+
+
+

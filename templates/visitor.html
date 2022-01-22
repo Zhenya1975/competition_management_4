@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <title>Visitor</title>
+</head>
+<body>
+    <div class="container" id="default_container">
+        <div class="row" style="margin-top: 100px">
+            <div class="col" style="text-align: center">
+                <h1 >Первенство Москвы по каратэ</h1>
+                <p>ТАБЛО</p>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="container" id="fight_container">
+        <div class="row justify-content-between">
+            <div class="col-lg-6">
+                <h3 id="competition_name"></h3>
+                <h4 id="age_category_name"></h4>
+                <h4 id="weight_category_name"></h4>
+                <h4 id="round_no"></h4>
+            </div>
+            <div class="col-lg-6 text-right">
+                <h1>ТАЙМЕР</h1>
+                <div class="display-3">
+                    <span id="timer_slave"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row"> <!--ряд с участниками -->
+
+            <div class="col d-flex justify-content-start"> <!--левая колонка для левого участника -->
+
+                    <div style="background-color: red; width: 5%; margin-right: 5px"></div> <!-- это див с красной полоской -->
+                    <div> <!-- это див с левым участником-->
+                            {#{% for fighter in fighters_from_DB %}
+                                {% if fighter.red_fighter == True %}#}
+                                    <h2 id="red_fighter_name"></h2>
+                                    <img id="red_fighter_pic" src="" class="img-fluid" alt="Responsive image" width="200" height="200">
+                                {#{% endif %}
+                            {% endfor %}#}
+
+                    </div> <!-- конец дива с левым участником-->
+            </div> <!--конец левой колонкя для левого участника -->
+            <div class="col">
+
+                <div class="display-4 d-flex justify-content-center">СЧЕТ</div>
+
+                <div class="display-2 d-flex justify-content-center">
+                 <span id="left_fighter_score_result_text">0</span>
+                    <span> : </span>
+                    <span id="right_fighter_score_result_text">0</span>
+                </div>
+
+            </div>
+
+            <div class="col"> <!--правая колонка для правого участника -->
+                <div style="text-align: left"> <!-- это див с правым участником-->
+                    {#{% for fighter in fighters_from_DB %}
+                        {% if fighter.red_fighter == False %}#}
+                            <h2 id="blue_fighter_name"></h2>
+                            <img id="blue_fighter_pic" src="" class="img-fluid" alt="Responsive image" width="200" height="200">
+                        {#{% endif %}
+                    {% endfor %}#}
+
+                </div> <!-- конец дива с правым участником-->
+            </div><!--конец правой колонки для правого участника -->
+
+
+        </div> <!--конец ряда с участниками -->
+
+
+
+
+
+    </div>
+
+
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js" integrity="sha256-bQmrZe4yPnQrLTY+1gYylfNMBuGfnT/HKsCGX+9Xuqo=" crossorigin="anonymous"></script>
+    <script>
+
+        $(document).ready(function(){
+            document.getElementById("default_container").hidden = false
+            document.getElementById("fight_container").hidden = true
+
+            /*функция, которая забирает время, а отдает текст*/
+            function timer_display(current_time_value){
+                var minutes = ('0' + Math.floor((current_time_value / 60) % 60)).slice(-2);
+                var seconds = ('0' + Math.floor(current_time_value % 60)).slice(-2);
+                time_display = minutes + ':' + seconds
+                return time_display
+                    }
+            document.getElementById('timer_slave').innerHTML = timer_display({{ fight_duration_server_value }})
+
+            //var socket = io.connect('http://localhost:5000');
+            var socket = io.connect();
+
+            socket.on('after connect', function(msg){
+                console.log('After connect', msg);2
+            });
+
+
+
+            socket.on('update_timer_value', function (msg){
+                console.log(msg.timer_sent)
+                document.getElementById('timer_slave').innerHTML = timer_display(msg.timer_sent)
+            })
+
+            socket.on('update_competition_name', function (msg){
+                document.getElementById("fight_container").hidden = false
+                document.getElementById("default_container").hidden = true
+                document.getElementById('competition_name').innerHTML = msg.competition_name
+                document.getElementById('weight_category_name').innerHTML = "Весовая категория: " + msg.weight_category_name
+                document.getElementById('age_category_name').innerHTML = "Возрастная категория: " + msg.age_category_name
+                document.getElementById('round_no').innerHTML = "Круг: " + msg.roundno
+                document.getElementById("red_fighter_pic").src = msg.red_pic
+                document.getElementById("blue_fighter_pic").src = msg.blue_pic
+            })
+
+            socket.on('update_left_fighter_score', function (msg){
+                document.getElementById('left_fighter_score_result_text').innerHTML = msg.left_fighter_score
+            })
+
+            socket.on('update_right_fighter_score', function (msg){
+                document.getElementById('right_fighter_score_result_text').innerHTML = msg.right_fighter_score
+            })
+
+        })
+    </script>
+
+
+
+</body>
+</html>

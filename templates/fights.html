@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Fights
+{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/dataTables.bootstrap4.min.css">
+{% endblock %}
+
+
+
+{% block content %}
+    <div class="container-fluid" style="margin-top: 10px">
+        <div class="row"> <!-- это ряд, в котором лежат два блока - список боев и фильтра -->
+            <div class="col-lg-12 shadow p-3 mb-5 bg-white rounded text-center"> <!-- это колонка с таблицей боеы -->
+                <nav aria-label="breadcrumb">
+                      <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{url_for('competitions')}}">Список соревнований</a></li>
+                        <li class="breadcrumb-item"><a href="{{url_for('competition_view', competition_id = competition_data.competition_id)}}">{{ competition_data.competition_name }}</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Поединки</li>
+                      </ol>
+                </nav>
+                <h3>{{ competition_data.competition_name }}</h3>
+                <h4>Список боев</h4>
+
+                <table id="fights_table" class="table table-sm table-responsive">
+                      <thead>
+                        <tr>
+                          <th scope="col">#</th>
+                          <th scope="col">Круг</th>
+                          <th scope="col">Категория</th>
+                          <th scope="col">Возраст</th>
+                          <th scope="col">Участник 1, кр</th>
+                          <th scope="col">Участник 2</th>
+                          <th scope="col">Статус боя</th>
+                          <th scope="col">Результат боя</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      {% for fight in fights_in_competition %}
+                          {% if fight.fight_status %}
+                            <tr class="table-secondary">
+                          {% else %}
+                            <tr>
+                          {% endif %}
+                          <td>
+                          <a href="{{url_for('select_fight_status', comp_id = fight.competition_id, weight_cat_id = fight.weight_category, age_cat_id = fight.age_category, round_no = fight.round_number, fight_id = fight.fight_id)}}">
+                          Бой №{{ fight.fight_id }}
+                              </a>
+                          </td>
+                          <td>{{ fight.roundNo.round_name }}</td>
+                          <td>{{ fight.weight_category_backref.weight_category_name }}</td>
+                          <td>{{ fight.age_category_backref.age_category_name }}</td>
+                          <td>{{ fight.red_fighter.name +" "+ fight.red_fighter.last_name}}</td>
+                          <td>{{ fight.blue_fighter.name +" " + fight.blue_fighter.last_name}}</td>
+                          <td>
+                              {% if  fight.fight_status%}
+                                    Завершен
+                              {% else %}
+                                 Запланирован
+                                {% endif %}
+                          </td>
+                          <td>
+                              {% if  fight.fight_result %}
+                                {{fight.fight_result}}</td>
+                            {% endif %}
+                        </tr>
+                      {% endfor %}
+                      </tbody>
+                </table>
+
+            </div> <!-- конец колонки с таблицей боеы -->
+            {#<div class="col-lg-3 shadow p-3 mb-5 bg-white rounded"> <!-- это колонка с фильтрами -->
+                    <h4 style="text-align: center">Фильтры</h4>
+            </div> <!-- это конец колонки с фильтрами -->#}
+        </div>
+
+
+    </div> <!-- конец дива с контейнером -->
+
+<!-- Начало скриптов -->
+{#<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>#}
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.24/datatables.min.js" defer></script>
+
+
+
+<script>
+    $(document).ready(function() {
+        $('#fights_table').DataTable({
+  "autoWidth": false
+});
+    } );
+</script>
+
+{% endblock %}

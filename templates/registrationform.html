@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+
+
+
+    <title>Регистрация</title>
+</head>
+<body>
+<!-- Это начало Nav Bar-->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        {#<a class="navbar-brand" href="#">Fights Management System</a>#}
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+              <li class="nav-item">
+                <a class="nav-link" href="{{url_for('index')}}">Главная</a>
+              </li>
+
+              <li class="nav-item">
+                <a class="nav-link" href="{{url_for('competitions')}}">Соревнования</a>
+              </li>
+
+              <li class="nav-item">
+                <a class="nav-link" href="{{url_for('settings_form')}}">Настройки</a>
+              </li>
+
+            </ul>
+        </div>
+    </nav>
+<!-- Это конец Nav Bar-->
+
+
+    <div class="container" style="margin-top: 10px">
+
+            <div class="row">
+                <div class="col-lg-12 p-3 mb-5 ">
+                    <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{url_for('competitions')}}">Список соревнований</a></li>
+                        <li class="breadcrumb-item"><a href="{{url_for('competition_view', competition_id = competition_data.competition_id)}}">{{ competition_data.competition_name }}</a></li>
+                      <li class="breadcrumb-item"><a href="{{url_for('registration', competition_id = competition_data.competition_id)}}">Регистрация. Список</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Регистрация</li>
+                  </ol>
+                </nav>
+
+                    <div class="row justify-content-center">
+                        <h3>{{ competition_data.competition_name }} Регистрация</h3>
+                    </div>
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                    <ul style="padding-left: 0">
+                        {% for message in messages %}
+                        <div class="alert alert-success" role="alert">
+                            <li style="list-style-type: none;">{{ message }}</li>
+                        </div>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                {% endwith %}
+
+                    <div class="row d-flex justify-content-between" style="margin-right: 0px;margin-bottom: 20px;">
+                        <a href="{{url_for('registration', competition_id = competition_data.competition_id)}}"><button type="button" class="btn btn-link">В список регистраций</button></a>
+                        <a href="{{url_for('delete_registration', competition_id = competition_data.competition_id, registration_id = reg.id)}}"><button type="button" class="btn btn-danger">Удалить</button></a>
+                    </div>
+
+            <form id="registration_form" method="POST" action="{{ url_for('registration_view', competition_id = competition_data.competition_id, registration_id = reg.id) }}">
+
+            <div class="row">
+                    <div class="col-lg-2">
+                        <img src={{ reg.fighter.fighter_image }} class="img-fluid" alt="Responsive image" width="150" height="150">
+                    </div>
+                    <div class="col-lg-10">
+                        <h2>{{ reg.fighter.name }}  {{ reg.fighter.last_name }}</h2>
+                        <p>Дата рождения: {{ reg.fighter.birthday.strftime('%d.%m.%Y') }}. <br/>
+                            Полных лет на дату начала соревнования {{ reg.competition.competition_date_start.strftime('%d.%m.%Y') }}: {{ age }} <br/>
+                            Возрастная категория: {{ reg.age_categories.age_category_name }}</p>
+
+                        <div class="form-group w-50">
+                            <label for="weight_field">Вес, кг</label>
+                            <input class="form-control" type="number" id="weight_field" name="weight_field" value={{ reg.fighter_registration_weight }}>
+                          </div>
+                        <p>Весовая категория: {{ reg.weight_categories.weight_category_name }}</p>
+                        <button type="submit" class="btn btn-primary">Сохранить</button>
+
+                    </div>
+
+                </div>
+
+            </form>
+        </div>
+</div>
+</div>
+<!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+
+
+
+
+</body>

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ competition_data.competition_name }}
+{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+{% endblock %}
+
+{% block content %}
+    <div class="container" style="margin-top: 10px">
+
+            <div class="row"> <!-- это ряд, в котором лежат два блока форма с соревнованием и блок с ссылками -->
+            <div class="col-lg-9 shadow p-3 mb-5 bg-white rounded"> <!-- это колонка с формой соревнования -->
+                <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{url_for('competitions')}}">Список соревнований</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ competition_data.competition_name }}</li>
+                  </ol>
+                </nav>
+                <div class="row justify-content-center">
+                    <h3>{{ competition_data.competition_name }}</h3>
+                </div>
+
+                <form method="POST" action="{{ url_for('competition_view', competition_id = competition_data.competition_id) }}">
+                    {{ form.csrf_token }}
+                        <div class="form-group">
+                            {{ form.competition_name_form.label }}
+                            {{ form.competition_name_form (class ='form-control', value = competition_data.competition_name)}}
+                        <br>
+                              {% for error in form.competition_name_form.errors %}
+                                <span style="color: red;">[{{ error }}]</span>
+                              {% endfor %}
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.competition_date_start.label }}
+                            {{ form.competition_date_start (class ='form-control', type="date", value = competition_data.competition_date_start)}}
+                        <br>
+                              {% for error in form.competition_date_start.errors %}
+                                <span style="color: red;">[{{ error }}]</span>
+                              {% endfor %}
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.competition_date_finish.label }}
+                            {{ form.competition_date_finish (class ='form-control', type="date", value = competition_data.competition_date_finish)}}
+                        <br>
+                              {% for error in form.competition_date_start.errors %}
+                                <span style="color: red;">[{{ error }}]</span>
+                              {% endfor %}
+                        </div>
+
+                         <div class="form-group">
+                            {{ form.competition_city.label }}
+                            {{ form.competition_city (class ='form-control', type="text", value = competition_data.competition_city)}}
+                        <br>
+                              {% for error in form.competition_date_start.errors %}
+                                <span style="color: red;">[{{ error }}]</span>
+                              {% endfor %}
+                        </div>
+
+
+                         {{ form.submit (class ='btn btn-primary')}}
+
+
+                  </form>
+
+
+            </div> <!-- это конец колонки с формой соревнования -->
+            <div class="col-lg-3 shadow p-3 mb-5 bg-white rounded"> <!-- это колонка с ссылками -->
+                    <h4 style="text-align: center">Ссылки</h4>
+                {#<p><a href="{{url_for('fights')}}">Поединки</a></p>#}
+                <p><a href="{{url_for('registration', competition_id = competition_data.competition_id)}}">Регистрация</a></p>
+                <p><a href="{{url_for('competition_fights_view', comp_id = competition_data.competition_id)}}">Поединки</a></p>
+                <p><a href="{{url_for('fight_constructor', comp_id = competition_data.competition_id)}}">Конструктор</a></p>
+            </div> <!-- это конец колонки с фильтрами -->
+        </div>
+
+
+    </div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>>
+<script>
+$(document).ready(function(){
+
+})
+</script>
+
+{% endblock %}
